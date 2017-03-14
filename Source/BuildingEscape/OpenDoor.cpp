@@ -30,9 +30,9 @@ void UOpenDoor::OpenDoor()
 {
 	//Create Rotator
 	FRotator rotation = owner->GetActorRotation();
-	if (rotation.Yaw > -90)
+	if (rotation.Yaw > openAngle)
 	{
-		rotation.Yaw -= openAngle;
+		rotation.Yaw -= 5.f;
 
 		//Set Door Rotation
 		owner->SetActorRotation(rotation);
@@ -45,7 +45,7 @@ void UOpenDoor::CloseDoor()
 	FRotator rotation = owner->GetActorRotation();
 	if (rotation.Yaw < originalRot.Yaw)
 	{
-		rotation.Yaw += openAngle;
+		rotation.Yaw += 5.f;
 
 		//Set Door Rotation
 		owner->SetActorRotation(rotation);

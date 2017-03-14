@@ -26,13 +26,13 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere)
-	float doorRaise = 5.f;
+	float doorRaise = 320.f;
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* pressurePlate;
 	AActor* actorThatOpens;
 	AActor* owner;
 	UPROPERTY(EditAnywhere)
-	float doorCloseDelay = 1.f;
+	float doorCloseDelay = 0.5f;
 	float lastDoorOpenTime;
 	FVector originalLoc;
 

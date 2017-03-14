@@ -28,9 +28,9 @@ void UOpenSecretDoor::BeginPlay()
 void UOpenSecretDoor::OpenSecretDoor()
 {
 	FVector location = owner->GetActorLocation();
-	if (location.Z < 320)
+	if (location.Z < doorRaise)
 	{
-		location.Z += doorRaise;
+		location.Z += 5.f;
 		owner->SetActorLocation(location);
 	}
 }
@@ -40,7 +40,7 @@ void UOpenSecretDoor::CloseSecretDoor()
 	FVector location = owner->GetActorLocation();
 	if (location.Z > originalLoc.Z)
 	{
-		location.Z -= doorRaise;
+		location.Z -= 5.f;
 		owner->SetActorLocation(location);
 	}
 }
