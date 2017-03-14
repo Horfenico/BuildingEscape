@@ -19,18 +19,28 @@ UOpenSecretDoor::UOpenSecretDoor()
 void UOpenSecretDoor::BeginPlay()
 {
 	Super::BeginPlay();
-
+	owner = GetOwner();
+	originalLoc = owner->GetActorLocation();
 	actorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 	
 }
 
 void UOpenSecretDoor::OpenSecretDoor()
 {
-	AActor* owner = GetOwner();
 	FVector location = owner->GetActorLocation();
 	if (location.Z < 320)
 	{
 		location.Z += doorRaise;
+		owner->SetActorLocation(location);
+	}
+}
+
+void UOpenSecretDoor::CloseSecretDoor()
+{
+	FVector location = owner->GetActorLocation();
+	if (location.Z > originalLoc.Z)
+	{
+		location.Z -= doorRaise;
 		owner->SetActorLocation(location);
 	}
 }
@@ -44,6 +54,11 @@ void UOpenSecretDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	if (pressurePlate->IsOverlappingActor(actorThatOpens))
 	{
 		OpenSecretDoor();
+		lastDoorOpenTime = GetWorld()->GetTimeSeconds();
+	}
+	if (GetWorld()->GetTimeSeconds() - lastDoorOpenTime > doorCloseDelay)
+	{
+		CloseSecretDoor();
 	}
 }
 

@@ -14,11 +14,11 @@ class BUILDINGESCAPE_API UOpenSecretDoor : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UOpenSecretDoor();
-
+	void OpenSecretDoor();
+	void CloseSecretDoor();
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	void OpenSecretDoor();
 
 public:	
 	// Called every frame
@@ -30,6 +30,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* pressurePlate;
 	AActor* actorThatOpens;
+	AActor* owner;
+	UPROPERTY(EditAnywhere)
+	float doorCloseDelay = 1.f;
+	float lastDoorOpenTime;
+	FVector originalLoc;
 
 		
 	
