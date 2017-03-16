@@ -5,16 +5,13 @@
 
 #define OUT
 
-
 // Sets default values for this component's properties
 UGrabber::UGrabber()
 {
 	/// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	/// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
 }
-
 
 // Called when the game starts
 void UGrabber::BeginPlay()
@@ -24,38 +21,30 @@ void UGrabber::BeginPlay()
 	GetInput();
 }
 
-
 // Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	//TODO REFACTOR!!!
-	FVector location;
-	FRotator rotation;
-
-	/// Get player view point this tick
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT location, OUT rotation);
+	GetPlayerViewPoint();
 
 	///Log view point every tick
 	/*UE_LOG(LogTemp, Warning, TEXT("Player is at location: %s and rotation: %s"), *location.ToString(), *rotation.ToString())*/
-	FVector lineTraceEnd = location + (rotation.Vector() * reach);
 
 	//If physics handle is attached
-	if (physicsHandle->GrabbedComponent)
+	if (physicsHandle)
 	{
-		//Move the object we're holding each frame
-		physicsHandle->SetTargetLocation(lineTraceEnd);
+		//if component grabbed
+		if (physicsHandle->GrabbedComponent)
+		{
+			//Move the object we're holding each frame
+			physicsHandle->SetTargetLocation(GetLineTraceEnd());
+		}
 	}
-
-
-	
 }
 
 void UGrabber::Grab()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab Key Pressed."));
-
 	//Line trace and see if we reaach any actors with PhysicsBody set
 	auto hitResult = GetFirstPhysicsBodyInReach();
 	auto componentToGrab = hitResult.GetComponent();
@@ -71,7 +60,6 @@ void UGrabber::Grab()
 void UGrabber::Release()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab Key Released."))
-	//release physics handle
 	physicsHandle->ReleaseComponent();
 
 }
@@ -79,14 +67,9 @@ void UGrabber::Release()
 void UGrabber::GetPhysicsHandle()
 {
 	physicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if (physicsHandle)
+	if (!physicsHandle)
 	{
-		///Physics handle found
-
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Warning! Physics handle for %s not found."), *GetOwner()->GetName())
+		UE_LOG(LogTemp, Error, TEXT("Warning! Physics handle for %s not found."), *GetOwner()->GetName());
 	}
 }
 
@@ -95,7 +78,6 @@ void UGrabber::GetInput()
 	input = GetOwner()->FindComponentByClass<UInputComponent>();
 	if (input)
 	{
-		///Bind the input action
 		input->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 		input->BindAction("Grab", IE_Released, this, &UGrabber::Release);
 	}
@@ -105,33 +87,25 @@ void UGrabber::GetInput()
 	}
 }
 
-const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
+void UGrabber::GetPlayerViewPoint()
 {
-	FVector location;
-	FRotator rotation;
-
-	/// Get player view point this tick
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT location, OUT rotation);
-
-	///Log view point every tick
-	/*UE_LOG(LogTemp, Warning, TEXT("Player is at location: %s and rotation: %s"), *location.ToString(), *rotation.ToString())*/
-	FVector lineTraceEnd = location + (rotation.Vector() * reach);
-
-	///Set up query parameters
-	FCollisionQueryParams traceParams(FName(TEXT("")), false, GetOwner());
-
-	///line trace(Ray-cast) out to reach distance
-	FHitResult hit;
-	GetWorld()->LineTraceSingleByObjectType(OUT hit, location, lineTraceEnd,
-		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
-		traceParams);
-
-	///See what we hit
-	AActor* actorHit = hit.GetActor();
-	if (actorHit)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Line Trace Hit: %s"), *actorHit->GetName());
-	}
-	return hit;
 }
 
+FVector UGrabber::GetLineTraceEnd()
+{
+	return location + (rotation.Vector() * reach);
+}
+
+const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
+{
+	GetPlayerViewPoint();
+	///Set up query parameters
+	FCollisionQueryParams traceParams(FName(TEXT("")), false, GetOwner());
+	///line trace(Ray-cast) out to reach distance
+	FHitResult hit;
+	GetWorld()->LineTraceSingleByObjectType(OUT hit, location, GetLineTraceEnd(),
+		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
+		traceParams);
+	return hit;
+}

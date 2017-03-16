@@ -23,14 +23,18 @@ protected:
 private:
 	//how far ahead of the player can we reach
 	float reach = 100.f;
-
 	UPhysicsHandleComponent* physicsHandle = nullptr;
 	UInputComponent* input = nullptr;
+	FVector location;
+	FVector lineTraceEnd;
+	FRotator rotation;
 	//Ray-cast and grab what's in reach
 	void Grab();
 	void Release();
 	void GetPhysicsHandle();
 	void GetInput();
+	void GetPlayerViewPoint();
+	FVector GetLineTraceEnd();
 
 	//Return hit for first physics body in reach
 	const FHitResult GetFirstPhysicsBodyInReach();
