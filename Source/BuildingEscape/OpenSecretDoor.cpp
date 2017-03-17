@@ -65,7 +65,7 @@ void UOpenSecretDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (GetTotalMassOfActorsOnPlate() > 80.f)
+	if (GetTotalMassOfActorsOnPlate() > triggerWeight)
 	{
 		OpenSecretDoor();
 		lastDoorOpenTime = GetWorld()->GetTimeSeconds();

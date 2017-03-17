@@ -31,9 +31,11 @@ private:
 	float doorRaise = 320.f;
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* pressurePlate;
-	AActor* owner;
 	UPROPERTY(EditAnywhere)
 	float doorCloseDelay = 0.5f;
+	UPROPERTY(EditAnywhere)
+	float triggerWeight = 80.f;
+	AActor* owner;
 	float lastDoorOpenTime;
 	FVector originalLoc;
 
