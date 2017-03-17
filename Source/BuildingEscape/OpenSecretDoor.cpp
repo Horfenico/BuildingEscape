@@ -21,7 +21,6 @@ void UOpenSecretDoor::BeginPlay()
 	Super::BeginPlay();
 	owner = GetOwner();
 	originalLoc = owner->GetActorLocation();
-	actorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 	
 }
 
@@ -45,13 +44,28 @@ void UOpenSecretDoor::CloseSecretDoor()
 	}
 }
 
+float UOpenSecretDoor::GetTotalMassOfActorsOnPlate()
+{
+	float totalMass = 0.f;
+	//Find all overlapping actors
+	TArray<AActor*> overlappingActors;
+	pressurePlate->GetOverlappingActors(OUT overlappingActors);
+	//Iterate through them, adding their masses
+	for (const auto* i : overlappingActors)
+	{
+		totalMass += i->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+		UE_LOG(LogTemp, Warning, TEXT("Actor: %s"), *i->GetName())
+	}
+	return totalMass;
+}
+
 
 // Called every frame
 void UOpenSecretDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (pressurePlate->IsOverlappingActor(actorThatOpens))
+	if (GetTotalMassOfActorsOnPlate() > 80.f)
 	{
 		OpenSecretDoor();
 		lastDoorOpenTime = GetWorld()->GetTimeSeconds();

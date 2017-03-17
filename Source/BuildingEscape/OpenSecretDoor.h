@@ -16,6 +16,8 @@ public:
 	UOpenSecretDoor();
 	void OpenSecretDoor();
 	void CloseSecretDoor();
+	float GetTotalMassOfActorsOnPlate();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -29,7 +31,6 @@ private:
 	float doorRaise = 320.f;
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* pressurePlate;
-	AActor* actorThatOpens;
 	AActor* owner;
 	UPROPERTY(EditAnywhere)
 	float doorCloseDelay = 0.5f;

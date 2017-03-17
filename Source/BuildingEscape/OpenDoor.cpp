@@ -23,7 +23,6 @@ void UOpenDoor::BeginPlay()
 	owner = GetOwner();
 	originalRot = owner->GetActorRotation();
 	//set actor that opens to play body
-	actorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 void UOpenDoor::OpenDoor()
@@ -59,7 +58,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// Poll the trigger volume every frame
-	if (pressurePlate->IsOverlappingActor(actorThatOpens))
+	if (GetTotalMassOfActorsOnPlate() > 20.f) //TODO make into a parameter
 	{
 		OpenDoor();
 		lastDoorOpenTime = GetWorld()->GetTimeSeconds();
@@ -70,5 +69,21 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	{
 		CloseDoor();
 	}
+}
+
+float UOpenDoor::GetTotalMassOfActorsOnPlate()
+{
+	float totalMass = 0.f;
+	TArray<AActor*> overlappingActors;
+	//Find all overlapping actors
+	pressurePlate->GetOverlappingActors(OUT overlappingActors);
+	//Iterate through them, adding their masses
+	for (const auto* i : overlappingActors)
+	{
+		totalMass += i->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+		UE_LOG(LogTemp,Warning,TEXT("Actor: %s"), *i->GetName())
+
+	}
+	return totalMass;
 }
 

@@ -16,6 +16,7 @@ public:
 	UOpenDoor();
 	void OpenDoor();
 	void CloseDoor();
+	float GetTotalMassOfActorsOnPlate();
 
 protected:
 	// Called when the game starts
@@ -32,7 +33,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float doorCloseDelay = 5.f;
 	float lastDoorOpenTime;
-	AActor* actorThatOpens;
 	AActor* owner;
 	FRotator originalRot;
 		
