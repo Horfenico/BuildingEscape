@@ -33,16 +33,9 @@ public:
 	FDoorEvent OnClose;
 private:
 	UPROPERTY(EditAnywhere)
-	float openAngle = 0.5f;
-	UPROPERTY(EditAnywhere)
 	ATriggerVolume* pressurePlate = nullptr;
 	UPROPERTY(EditAnywhere)
-	float doorCloseDelay = 5.f;
-	UPROPERTY(EditAnywhere)
 	float triggerWeight = 10.f;
-	float lastDoorOpenTime;
 	AActor* owner = nullptr;
 	FRotator originalRot;
-		
-	
 };

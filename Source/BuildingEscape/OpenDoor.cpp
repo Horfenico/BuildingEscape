@@ -26,31 +26,8 @@ void UOpenDoor::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("No Pressure Plate Assigned to Actor %s."), *owner->GetName());
 }
 
-void UOpenDoor::OpenDoor()
-{
-	////Create Rotator
-	FRotator rotation = owner->GetActorRotation();
-	if (rotation.Yaw > openAngle)
-	{
-		rotation.Yaw -= 5.f;
 
-		//Set Door Rotation
-		owner->SetActorRotation(rotation);
-	}
-}
 
-void UOpenDoor::CloseDoor()
-{
-	//Create Rotator
-	FRotator rotation = owner->GetActorRotation();
-	if (rotation.Yaw < originalRot.Yaw)
-	{
-		rotation.Yaw += 5.f;
-
-		//Set Door Rotation
-		owner->SetActorRotation(rotation);
-	}
-}
 
 
 // Called every frame
@@ -61,17 +38,12 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	// Poll the trigger volume every frame
 	if (GetTotalMassOfActorsOnPlate() > triggerWeight) 
 	{
-		OpenDoor();
-		lastDoorOpenTime = GetWorld()->GetTimeSeconds();
-		//OnOpen.Broadcast();
+		OnOpen.Broadcast();
 	}
 	
-	//check if it's time to close the door
-	if (GetWorld()->GetTimeSeconds() - lastDoorOpenTime > doorCloseDelay)
-	//else
+	else
 	{
-		CloseDoor();
-		//OnClose.Broadcast();
+		OnClose.Broadcast();
 	}
 }
 
