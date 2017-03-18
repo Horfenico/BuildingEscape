@@ -30,16 +30,16 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	///Log view point every tick
 	/*UE_LOG(LogTemp, Warning, TEXT("Player is at location: %s and rotation: %s"), *location.ToString(), *rotation.ToString())*/
 
+	
 	//If physics handle is attached
-	if (physicsHandle)
+	if (!physicsHandle) return;
+	//if component grabbed
+	if (physicsHandle->GrabbedComponent)
 	{
-		//if component grabbed
-		if (physicsHandle->GrabbedComponent)
-		{
-			//Move the object we're holding each frame
-			physicsHandle->SetTargetLocation(GetLineTraceEnd());
-		}
+		//Move the object we're holding each frame
+		physicsHandle->SetTargetLocation(GetLineTraceEnd());
 	}
+
 }
 
 void UGrabber::Grab()
@@ -51,14 +51,16 @@ void UGrabber::Grab()
 	auto actorHit = hitResult.GetActor();
 	//If we hit something attach physics handle
 	//attach physics handle
+	if (!physicsHandle) return;
 	if (actorHit)
 	{
-		physicsHandle->GrabComponent(componentToGrab, NAME_None, componentToGrab->GetOwner()->GetActorLocation(), true);
+		physicsHandle->GrabComponentAtLocationWithRotation(componentToGrab, NAME_None, componentToGrab->GetOwner()->GetActorLocation(), FRotator(0, 0, 0));
 	}
 }
 
 void UGrabber::Release()
 {
+	if (!physicsHandle) return;
 	UE_LOG(LogTemp, Warning, TEXT("Grab Key Released."))
 	physicsHandle->ReleaseComponent();
 

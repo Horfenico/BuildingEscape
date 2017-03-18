@@ -22,12 +22,13 @@ void UOpenDoor::BeginPlay()
 	// Find Owning Actor
 	owner = GetOwner();
 	originalRot = owner->GetActorRotation();
-	//set actor that opens to play body
+	if (!pressurePlate)
+		UE_LOG(LogTemp, Error, TEXT("No Pressure Plate Assigned to Actor %s."), *owner->GetName());
 }
 
 void UOpenDoor::OpenDoor()
 {
-	//Create Rotator
+	////Create Rotator
 	FRotator rotation = owner->GetActorRotation();
 	if (rotation.Yaw > openAngle)
 	{
@@ -58,16 +59,19 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// Poll the trigger volume every frame
-	if (GetTotalMassOfActorsOnPlate() > triggerWeight) //TODO make into a parameter
+	if (GetTotalMassOfActorsOnPlate() > triggerWeight) 
 	{
 		OpenDoor();
 		lastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		//OnOpen.Broadcast();
 	}
 	
 	//check if it's time to close the door
 	if (GetWorld()->GetTimeSeconds() - lastDoorOpenTime > doorCloseDelay)
+	//else
 	{
 		CloseDoor();
+		//OnClose.Broadcast();
 	}
 }
 
@@ -75,6 +79,8 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate()
 {
 	float totalMass = 0.f;
 	TArray<AActor*> overlappingActors;
+	if (!pressurePlate)
+		return totalMass;
 	//Find all overlapping actors
 	pressurePlate->GetOverlappingActors(OUT overlappingActors);
 	//Iterate through them, adding their masses

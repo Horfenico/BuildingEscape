@@ -21,7 +21,8 @@ void UOpenSecretDoor::BeginPlay()
 	Super::BeginPlay();
 	owner = GetOwner();
 	originalLoc = owner->GetActorLocation();
-	
+	if (!pressurePlate)
+		UE_LOG(LogTemp, Error, TEXT("No Pressure Plate Assigned to Actor %s."), *owner->GetName());
 }
 
 void UOpenSecretDoor::OpenSecretDoor()
@@ -49,6 +50,8 @@ float UOpenSecretDoor::GetTotalMassOfActorsOnPlate()
 	float totalMass = 0.f;
 	//Find all overlapping actors
 	TArray<AActor*> overlappingActors;
+	if (!pressurePlate)
+		return totalMass;
 	pressurePlate->GetOverlappingActors(OUT overlappingActors);
 	//Iterate through them, adding their masses
 	for (const auto* i : overlappingActors)
