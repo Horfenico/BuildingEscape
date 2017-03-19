@@ -25,6 +25,7 @@ private:
 	float reach = 100.f;
 	UPhysicsHandleComponent* physicsHandle = nullptr;
 	UInputComponent* input = nullptr;
+	UProjectileMovementComponent* move = nullptr;
 	FVector location;
 	FVector lineTraceEnd;
 	FRotator rotation;

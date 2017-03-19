@@ -60,16 +60,29 @@ void UGrabber::Grab()
 
 void UGrabber::Release()
 {
-	if (!physicsHandle) return;
-	UE_LOG(LogTemp, Warning, TEXT("Grab Key Released."))
-	physicsHandle->ReleaseComponent();
-
+		if (!physicsHandle) return;
+		UE_LOG(LogTemp, Warning, TEXT("Grab Key Released."))
+		physicsHandle->ReleaseComponent();
 }
+
 void UGrabber::Shoot()
 {
+	auto Offset = FVector(800.0f, 0.0f, -300.0f);
+	FVector const muzzleLocation = location + FTransform(rotation).TransformVector(Offset);
 	if (!physicsHandle) return;
-	UE_LOG(LogTemp, Warning, TEXT("Shoot Button Pressed."))
-	
+	if (physicsHandle->GrabbedComponent)
+	{
+		move = physicsHandle->GrabbedComponent->GetOwner()->FindComponentByClass<UProjectileMovementComponent>();
+		if (!move)
+		{
+			UE_LOG(LogTemp, Error, TEXT("No Movement Component Attached."));
+			return;
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Shoot Button Pressed."))
+		move->ComputeVelocity(rotation.Vector(), GetWorld()->DeltaTimeSeconds);
+		Release();
+		UE_LOG(LogTemp, Warning, TEXT("Owner: %s X: %f Y: %f Z: %f"), *move->GetOwner()->GetName(),move->Velocity.X, move->Velocity.Y, move->Velocity.Z);
+	}
 }
 
 void UGrabber::GetPhysicsHandle()
@@ -87,7 +100,7 @@ void UGrabber::GetInput()
 	if (input)
 	{
 		input->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
-		input->BindAction("Grab", IE_Released, this, &UGrabber::Release);
+		input->BindAction("Release", IE_Pressed, this, &UGrabber::Release);
 		input->BindAction("Shoot", IE_Pressed, this, &UGrabber::Shoot);
 	}
 	else
@@ -95,7 +108,6 @@ void UGrabber::GetInput()
 		UE_LOG(LogTemp, Error, TEXT("Warning! No Input Componenet on %s."), *GetOwner()->GetName())
 	}
 }
-
 
 void UGrabber::GetPlayerViewPoint()
 {
