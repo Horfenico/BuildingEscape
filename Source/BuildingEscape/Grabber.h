@@ -21,11 +21,14 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(EditAnywhere)
+	float speed = 100.f;
 	//how far ahead of the player can we reach
 	float reach = 100.f;
 	UPhysicsHandleComponent* physicsHandle = nullptr;
 	UInputComponent* input = nullptr;
-	UProjectileMovementComponent* move = nullptr;
+	UStaticMeshComponent* move = nullptr;
+	USphereComponent* lock = nullptr;
 	FVector location;
 	FVector lineTraceEnd;
 	FRotator rotation;
@@ -33,9 +36,17 @@ private:
 	void Grab();
 	void Release();
 	void Shoot();
+	void RotateStart();
+	void Rotate();
+	void RotateEnd();
 	void GetPhysicsHandle();
 	void GetInput();
 	void GetPlayerViewPoint();
+	bool rotateOn = false;
+	FVector oldLoc = FVector(0, 0, 0);
+	FRotator oldRot = FRotator(0, 0, 0);
+	APlayerCameraManager* camMan = nullptr;
+
 	FVector GetLineTraceEnd();
 
 	//Return hit for first physics body in reach

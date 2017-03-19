@@ -19,6 +19,8 @@ void UGrabber::BeginPlay()
 	Super::BeginPlay();
 	GetPhysicsHandle();
 	GetInput();
+	camMan = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+
 }
 
 // Called every frame
@@ -39,7 +41,12 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		//Move the object we're holding each frame
 		physicsHandle->SetTargetLocation(GetLineTraceEnd());
 	}
-
+	if (rotateOn)
+	{
+		lock = GetOwner()->FindComponentByClass<USphereComponent>();
+		lock->SetWorldLocation(oldLoc);
+		Rotate();
+	}
 }
 
 void UGrabber::Grab()
@@ -67,22 +74,38 @@ void UGrabber::Release()
 
 void UGrabber::Shoot()
 {
-	auto Offset = FVector(800.0f, 0.0f, -300.0f);
-	FVector const muzzleLocation = location + FTransform(rotation).TransformVector(Offset);
 	if (!physicsHandle) return;
 	if (physicsHandle->GrabbedComponent)
 	{
-		move = physicsHandle->GrabbedComponent->GetOwner()->FindComponentByClass<UProjectileMovementComponent>();
+		move = physicsHandle->GrabbedComponent->GetOwner()->FindComponentByClass<UStaticMeshComponent>();
 		if (!move)
 		{
 			UE_LOG(LogTemp, Error, TEXT("No Movement Component Attached."));
 			return;
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Shoot Button Pressed."))
-		move->ComputeVelocity(rotation.Vector(), GetWorld()->DeltaTimeSeconds);
 		Release();
-		UE_LOG(LogTemp, Warning, TEXT("Owner: %s X: %f Y: %f Z: %f"), *move->GetOwner()->GetName(),move->Velocity.X, move->Velocity.Y, move->Velocity.Z);
+		move->AddForce(speed * rotation.Vector(),NAME_None, true);
+		UE_LOG(LogTemp, Warning, TEXT("Owner: %s"),  *move->GetName());	
 	}
+}
+
+void UGrabber::RotateStart()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Rotate On."));
+	rotateOn = true;
+	oldLoc = GetOwner()->GetActorLocation();
+	oldRot = camMan->GetCameraRotation();
+}
+
+void UGrabber::Rotate()
+{
+}
+
+void UGrabber::RotateEnd()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Rotate Off."));
+	rotateOn = false;
 }
 
 void UGrabber::GetPhysicsHandle()
@@ -100,8 +123,10 @@ void UGrabber::GetInput()
 	if (input)
 	{
 		input->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
-		input->BindAction("Release", IE_Pressed, this, &UGrabber::Release);
+		input->BindAction("Grab", IE_Released, this, &UGrabber::Release);
 		input->BindAction("Shoot", IE_Pressed, this, &UGrabber::Shoot);
+		input->BindAction("Rotate", IE_Pressed, this, &UGrabber::RotateStart);
+		input->BindAction("Rotate", IE_Released, this, &UGrabber::RotateEnd);
 	}
 	else
 	{
@@ -113,6 +138,8 @@ void UGrabber::GetPlayerViewPoint()
 {
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT location, OUT rotation);
 }
+
+
 
 FVector UGrabber::GetLineTraceEnd()
 {
