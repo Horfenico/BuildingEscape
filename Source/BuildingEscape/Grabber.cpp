@@ -65,6 +65,12 @@ void UGrabber::Release()
 	physicsHandle->ReleaseComponent();
 
 }
+void UGrabber::Shoot()
+{
+	if (!physicsHandle) return;
+	UE_LOG(LogTemp, Warning, TEXT("Shoot Button Pressed."))
+	
+}
 
 void UGrabber::GetPhysicsHandle()
 {
@@ -82,12 +88,14 @@ void UGrabber::GetInput()
 	{
 		input->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 		input->BindAction("Grab", IE_Released, this, &UGrabber::Release);
+		input->BindAction("Shoot", IE_Pressed, this, &UGrabber::Shoot);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Warning! No Input Componenet on %s."), *GetOwner()->GetName())
 	}
 }
+
 
 void UGrabber::GetPlayerViewPoint()
 {

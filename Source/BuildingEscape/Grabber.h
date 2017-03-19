@@ -31,6 +31,7 @@ private:
 	//Ray-cast and grab what's in reach
 	void Grab();
 	void Release();
+	void Shoot();
 	void GetPhysicsHandle();
 	void GetInput();
 	void GetPlayerViewPoint();
