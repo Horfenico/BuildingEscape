@@ -43,7 +43,8 @@ bool UOpenEscapeDoor::EscapeTriggered()
 	pressurePlate->GetOverlappingActors(OUT overlappingActors);
 	for (const auto* i : overlappingActors)
 	{
-		if (i->GetName() == escapeActor)
+		FVector2D actRot = FVector2D(i->GetActorRotation().Pitch, i->GetActorRotation().Roll);
+		if (i->GetName() == escapeActor && actRot <= reqRot && actRot >= -reqRot)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Escape Actor Successfully placed."))
 				return true;

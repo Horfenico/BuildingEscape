@@ -32,7 +32,8 @@ private:
 	ATriggerVolume* pressurePlate = nullptr;
 	UPROPERTY(VisibleAnywhere)
 	FString escapeActor = "SM_EscapeStatue";
+	UPROPERTY(VisibleAnywhere)
+	FVector2D reqRot = FVector2D(0.5f,0.5f);
 	AActor* owner = nullptr;
-	FVector originalLoc;
-	
+	FVector originalLoc;	
 };
