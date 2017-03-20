@@ -42,6 +42,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	if (rotateOn)
 	{
 		lock = GetOwner()->FindComponentByClass<USphereComponent>();
+		if (!lock) return;
+		//Lock player location and rotation so camera doesn't move while rotating object.
 		lock->SetWorldLocation(oldLoc);
 		GetWorld()->GetFirstPlayerController()->SetControlRotation(oldRot);
 		Rotate();
@@ -114,13 +116,11 @@ void UGrabber::Rotate()
 	}
 }
 
-
 void UGrabber::RotateEnd()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Rotate Off."));
 	rotateOn = false;
 }
-
 
 void UGrabber::GetPhysicsHandle()
 {
