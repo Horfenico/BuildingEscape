@@ -32,6 +32,8 @@ private:
 	FVector location;
 	FVector lineTraceEnd;
 	FRotator rotation;
+	FVector oldLoc = FVector(0, 0, 0);
+	FRotator oldRot = FRotator(0, 0, 0);
 	//Ray-cast and grab what's in reach
 	void Grab();
 	void Release();
@@ -43,9 +45,6 @@ private:
 	void GetInput();
 	void GetPlayerViewPoint();
 	bool rotateOn = false;
-	FVector oldLoc = FVector(0, 0, 0);
-	FRotator oldRot = FRotator(0, 0, 0);
-	APlayerCameraManager* camMan = nullptr;
 
 	FVector GetLineTraceEnd();
 

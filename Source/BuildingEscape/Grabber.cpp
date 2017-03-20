@@ -19,8 +19,6 @@ void UGrabber::BeginPlay()
 	Super::BeginPlay();
 	GetPhysicsHandle();
 	GetInput();
-	camMan = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-
 }
 
 // Called every frame
@@ -45,6 +43,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	{
 		lock = GetOwner()->FindComponentByClass<USphereComponent>();
 		lock->SetWorldLocation(oldLoc);
+		GetWorld()->GetFirstPlayerController()->SetControlRotation(oldRot);
 		Rotate();
 	}
 }
@@ -92,21 +91,36 @@ void UGrabber::Shoot()
 
 void UGrabber::RotateStart()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Rotate On."));
-	rotateOn = true;
-	oldLoc = GetOwner()->GetActorLocation();
-	oldRot = camMan->GetCameraRotation();
+	if (!physicsHandle) return;
+	if (physicsHandle->GrabbedComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Rotate On."));
+		rotateOn = true;
+		oldLoc = GetOwner()->GetActorLocation();
+		oldRot = GetWorld()->GetFirstPlayerController()->GetControlRotation();
+	}
 }
 
 void UGrabber::Rotate()
 {
+	float mouseX;
+	float mouseY;
+	GetWorld()->GetFirstPlayerController()->GetMousePosition(OUT mouseX, OUT mouseY);
+	FRotator newRot(-mouseY, mouseX, 0);
+	if (!physicsHandle) return;
+	if (physicsHandle->GrabbedComponent)
+	{
+		physicsHandle->SetTargetRotation(newRot);
+	}
 }
+
 
 void UGrabber::RotateEnd()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Rotate Off."));
 	rotateOn = false;
 }
+
 
 void UGrabber::GetPhysicsHandle()
 {
@@ -138,8 +152,6 @@ void UGrabber::GetPlayerViewPoint()
 {
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT location, OUT rotation);
 }
-
-
 
 FVector UGrabber::GetLineTraceEnd()
 {
